@@ -1,17 +1,21 @@
 package me.jakejmattson.discordkt.api.arguments
 
 import me.jakejmattson.discordkt.api.dsl.CommandEvent
+import me.jakejmattson.discordkt.api.dsl.internalLocale
+import me.jakejmattson.discordkt.api.locale.inject
 
 /**
  * Consumes all arguments and returns a list of the results (split by splitter character).
  *
  * @param splitter The character used to split the input.
  */
-open class SplitterArg(override val name: String = "TextWithSplitter", private val splitter: String = "|") : ArgumentType<List<String>>() {
+open class SplitterArg(override val name: String = "TextWithSplitter", private val splitter: String = "|") : ArgumentType<List<String>> {
     /**
      * Consumes all arguments and returns a list of the results (split by '|' character).
      */
     companion object : SplitterArg()
+
+    override val description = internalLocale.splitterArgDescription.inject(splitter)
 
     override suspend fun convert(arg: String, args: List<String>, event: CommandEvent<*>): ArgumentResult<List<String>> {
         val joined = args.joinToString(" ")
@@ -22,6 +26,6 @@ open class SplitterArg(override val name: String = "TextWithSplitter", private v
         return Success(joined.split(splitter).toList(), args.size)
     }
 
-    override fun generateExamples(event: CommandEvent<*>) = listOf("A${splitter}B${splitter}C")
+    override suspend fun generateExamples(event: CommandEvent<*>) = listOf("A${splitter}B${splitter}C")
     override fun formatData(data: List<String>) = data.joinToString(splitter)
 }
